@@ -1,0 +1,4 @@
+Maps/Tiles/Furniture.png
+16 16
+1 13 12
+2 13 13
