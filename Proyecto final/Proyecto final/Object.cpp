@@ -1,5 +1,6 @@
 #include "Object.h"
 #include "Game.h"
+#include "Map.h"
 
 vector<Object*> Object::objs = {};
 Object::Object(sf::Vector2f size) : p_shape(size)
@@ -20,7 +21,7 @@ Object::~Object()
 void Object::Init(sf::Vector2f pos)
 {
 	game = Game::getInstance();
-	p_shape.setPosition(pos * 64.f);
+	p_shape.setPosition(pos * game->pixels);
 	o_posAnterior = p_shape.getPosition();
 }
 
@@ -37,6 +38,27 @@ void Object::Update(sf::Time deltaTime)
 		if (objs[i]->p_shape.getGlobalBounds().intersects(this->p_shape.getGlobalBounds()) && objs[i] != this) {
 			objs[i]->p_shape.setPosition(objs[i]->o_posAnterior);
 			this->p_shape.setPosition(this->o_posAnterior);
+		}
+	}
+	vector<Map*> maps = game->mm.maps();
+	for (int i = 0; i < maps.size(); i++) {
+		if (maps[i]->isActive()) {
+			for (int j = 0; j < maps[i]->map_layers.size(); j++) {
+				if (maps[i]->map_layers[j].l_layer == 2) {
+					for (vector<sf::RectangleShape> z : maps[i]->map_tiles_grids[j]) {
+						for (sf::RectangleShape y : z) {
+							if (y.getGlobalBounds().intersects(this->p_shape.getGlobalBounds())) {
+								this->p_shape.setPosition(this->o_posAnterior);
+							}
+						}
+					}
+				}
+			}
+			if (this->p_shape.getPosition().x <= 0 || this->p_shape.getPosition().x + this->p_shape.getSize().x >= maps[i]->map_size.x * game->pixels
+				|| this->p_shape.getPosition().y <= 0 || this->p_shape.getPosition().y + this->p_shape.getSize().y >= maps[i]->map_size.y * game->pixels)
+			{
+				this->p_shape.setPosition(this->o_posAnterior);
+			}
 		}
 	}
 	o_posAnterior = p_shape.getPosition();

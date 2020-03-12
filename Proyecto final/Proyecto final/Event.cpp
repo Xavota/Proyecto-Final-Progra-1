@@ -53,5 +53,10 @@ Event Event::DialogBox(string file_name, int pos)
 
 Event Event::setSpeed(float* speed, Player* player)
 {
-	return Event{ Tag::set_speed, Info{{{(void*)(speed), (void*)(player)}}} };
+	return Event{ Tag::set_speed, Info{{(void*)(speed), (void*)(player)}} };
+}
+
+Event Event::goToMap(string * map_name, sf::Vector2f* pos)
+{
+	return Event(Tag::go_to_map, Info{ {(void*)(map_name), (void*)(pos)} });
 }

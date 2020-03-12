@@ -24,12 +24,13 @@ void Game::Init()
 	, Event::DialogBox("DialogosNPC/generico.txt", 1)
 	, Event::DialogBox("DialogosNPC/generico.txt", 2)
 	, Event::setSpeed(new float(100.f), g_player) }, "Inicio");
-	map.Init({ 20.f, 20.f }, vector<Map::Layer>{ Map::Layer{"Maps/Identificators/Principal_layer1.txt", "Maps/Layers/Layer1.txt", 1}, 
-		Map::Layer{ "Maps/Identificators/Principal_layer2.txt", "Maps/Layers/Layer2.txt", 2 } }, &mWindow);
-	FM.CreateTrigger(Trigger::onTriggerEnter(2, 2, 4, 4, g_player), "Inicio");
-	FM.CreateTrigger(Trigger::onTriggerExit(2, 2, 4, 4, g_player), "Inicio");
-	FM.CreateTrigger(Trigger::onInteract(g_npc, g_player), "Inicio");
-	map.GoToMap({ 0, 0 });
+	FM.CreateFunction(&mWindow, { Event::goToMap(new string("Inicio"), new sf::Vector2f{ 0.f, 0.f }) }, "Ir a mapa");
+	FM.CreateTrigger(Trigger::onTriggerEnter({ 2, 2 }, { 4, 4 }, g_player), "Inicio");
+	FM.CreateTrigger(Trigger::onTriggerExit({ 2, 2 }, { 4, 4 }, g_player), "Inicio");
+	FM.CreateTrigger(Trigger::onInteract(g_npc, g_player), "Ir a mapa");
+	mm.AddMap(Map({ 20.f, 20.f }, vector<Map::Layer>{ Map::Layer{"Maps/Identificators/Principal_layer1.txt", "Maps/Layers/Layer1.txt", 1}, 
+		Map::Layer{ "Maps/Identificators/Principal_layer2.txt", "Maps/Layers/Layer2.txt", 2 } }, &mWindow), "Inicio");
+	mm.GoToMap("Inicio", { 0.f, 0.f });
 }
 
 void Game::run()
@@ -79,7 +80,7 @@ void Game::processEvents()
 void Game::update(sf::Time deltaTime)
 {
 	FM.Update(deltaTime);
-	map.Update(deltaTime);
+	mm.Update(deltaTime);
 	g_npc->Update(deltaTime);
 	g_player->Update(deltaTime);
 }
@@ -87,7 +88,7 @@ void Game::update(sf::Time deltaTime)
 void Game::render()
 {
 	mWindow.clear();
-	map.Render(&mWindow);
+	mm.Render(&mWindow);
 	g_npc->Render(&mWindow);
 	g_player->Render(&mWindow);
 	FM.Render(&mWindow);

@@ -30,10 +30,11 @@ void Function::handleInputs(sf::Keyboard::Key key, bool isPressed)
 
 void Function::Init(sf::RenderWindow* w, vector<Event> e, string n)
 {
-	window = w;
-	f_dialogBox.Init(w, sf::Color::Blue, sf::Color::White, sf::Color::White, "Fonts/Drawingfree.ttf", 40, .1f);
+	f_dialogBox = Dialog_box::getInstance();
+	f_dialogBox->Init(w, sf::Color::Blue, sf::Color::White, sf::Color::White, "Fonts/Drawingfree.ttf", 40, .1f);
 	events = e;
 	f_name = n;
+	game = Game::getInstance();
 }
 
 void Function::Update(sf::Time deltaTime)
@@ -47,6 +48,8 @@ void Function::Update(sf::Time deltaTime)
 		case Event::Tag::set_speed:
 			setSpeed(*((float*)(events[f_nEvent].info.v1[0])), ((Player*)(events[f_nEvent].info.v1[1])));
 			break;
+		case Event::Tag::go_to_map:
+			GoToMap(*((string*)(events[f_nEvent].info.v1[0])), *((sf::Vector2f*)(events[f_nEvent].info.v1[1])));
 		default:
 			break;
 		}
@@ -55,12 +58,12 @@ void Function::Update(sf::Time deltaTime)
 			f_nEvent = 0;
 		}
 	}
-	f_dialogBox.Update(deltaTime);
+	f_dialogBox->Update(deltaTime);
 }
 
 void Function::Render(sf::RenderWindow* w)
 {
-	f_dialogBox.Render(w);
+	f_dialogBox->Render(w);
 }
 
 void Function::Destroy()
@@ -70,14 +73,14 @@ void Function::Destroy()
 void Function::TextBox(string text)
 {
 	if (!f_working) {
-		f_dialogBox.setActive(true);
-		f_dialogBox.Write(text);
+		f_dialogBox->setActive(true);
+		f_dialogBox->Write(text);
 		f_working = true;
 	}
 	else {
 		if (EnterPressed) {
-			f_dialogBox.Write("");
-			f_dialogBox.setActive(false);
+			f_dialogBox->Write("");
+			f_dialogBox->setActive(false);
 			f_working = false;
 			f_nEvent++;
 			EnterPressed = false;
@@ -88,5 +91,18 @@ void Function::TextBox(string text)
 void Function::setSpeed(float speed, Player * player)
 {
 	player->Speed = speed;
+	f_nEvent++;
+}
+
+void Function::GoToMap(const string& map_name, sf::Vector2f pos)
+{
+	try
+	{
+		game->mm.GoToMap(map_name, pos);
+	}
+	catch (runtime_error e)
+	{
+		cerr << e.what() << endl;
+	}
 	f_nEvent++;
 }

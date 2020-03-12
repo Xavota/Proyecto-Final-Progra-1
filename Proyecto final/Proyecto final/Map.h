@@ -24,13 +24,18 @@ public:
 		vector<ID> ids;
 	};
 	Map();
+	Map(sf::Vector2f size, vector<Layer> layers, sf::RenderWindow* w);
 	~Map();
 	void Init(sf::Vector2f size, vector<Layer> layers, sf::RenderWindow* w);
 	void Update(sf::Time deltaTime);
+	void handleInput(sf::Keyboard::Key key, bool ispressed);
 	void GoToMap(sf::Vector2f pos);
+	void OutOfMap();
+	bool isActive();
 	void Render(sf::RenderWindow* window);
 	void Destroy();
 private:
+	friend class Object;
 	ID findID(const vector<ID>& ids, int id) {
 		for (ID z : ids) {
 			if (z.ID_id == id)
@@ -45,6 +50,7 @@ private:
 	sf::Vector2f map_size;
 	sf::RenderWindow* window;
 	sf::View map_view;
+	vector<Layer> map_layers;
 	Game* game;
 };
 

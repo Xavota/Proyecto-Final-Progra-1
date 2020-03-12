@@ -6,6 +6,13 @@ Dialog_box::Dialog_box()
 {
 }
 
+Dialog_box * Dialog_box::instance = nullptr;
+Dialog_box * Dialog_box::getInstance()
+{
+	if (instance == nullptr)
+		instance = new Dialog_box();
+	return instance;
+}
 
 Dialog_box::~Dialog_box()
 {
@@ -111,6 +118,7 @@ void Dialog_box::Render(sf::RenderWindow * window)
 	for (int i = 0; i < 4; i++) {
 		window->draw(db_edge[i]);
 	}
+	db_text.setFont(db_text_font);
 	window->draw(db_text);
 }
 

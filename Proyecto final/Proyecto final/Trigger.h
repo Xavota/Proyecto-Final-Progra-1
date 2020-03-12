@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "Player.h"
+class Game;
 using namespace std;
 class Trigger
 {
@@ -17,9 +18,9 @@ public:
 	void Destory();
 	void handleInputs(sf::Keyboard::Key key, bool isPressed);
 	bool TriggerIsMet();
-	static Trigger* onTriggerEnter(int x1, int y1, int x2, int y2, Player* player);
-	static Trigger* onTriggerExit(int x1, int y1, int x2, int y2, Player* player);
-	static Trigger* onTriggerStay(int x1, int y1, int x2, int y2, Player* player);
+	static Trigger* onTriggerEnter(sf::Vector2f init, sf::Vector2f fin, Player* player);
+	static Trigger* onTriggerExit(sf::Vector2f init, sf::Vector2f fin, Player* player);
+	static Trigger* onTriggerStay(sf::Vector2f init, sf::Vector2f fin, Player* player);
 	static Trigger* onKeyPressed();
 	static Trigger* onKeyReleased();
 	static Trigger* onKey();
@@ -31,5 +32,6 @@ private:
 	sf::RectangleShape t_zones;
 	Player* g_player;
 	Object* t_Interactuable;
+	static Game* game;
 };
 

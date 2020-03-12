@@ -6,7 +6,7 @@ using namespace std;
 class Dialog_box
 {
 public:
-	Dialog_box();
+	static Dialog_box* getInstance();
 	~Dialog_box();
 	void setBoxColor(sf::Color box_color);
 	void setEdgeColor(sf::Color edge_color);
@@ -21,6 +21,8 @@ public:
 	void Render(sf::RenderWindow* window);
 	void Destroy();
 private:
+	static Dialog_box* instance;
+	Dialog_box();
 	sf::RectangleShape db_Rectangle;
 	sf::Color db_box_color, db_edge_color, db_text_color;
 	vector<sf::RectangleShape> db_edge{ sf::RectangleShape(), sf::RectangleShape(), sf::RectangleShape(), sf::RectangleShape() };

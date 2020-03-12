@@ -1,6 +1,5 @@
 #include "Trigger.h"
-
-
+#include "Game.h"
 
 Trigger::Trigger()
 {
@@ -10,7 +9,7 @@ Trigger::Trigger()
 Trigger::~Trigger()
 {
 }
-
+Game* Trigger::game = Game::getInstance();
 void Trigger::Init()
 {
 }
@@ -82,34 +81,34 @@ bool Trigger::TriggerIsMet()
 	}
 }
 
-Trigger* Trigger::onTriggerEnter(int x1, int y1, int x2, int y2, Player* player)
+Trigger* Trigger::onTriggerEnter(sf::Vector2f init, sf::Vector2f fin, Player* player)
 {
 	Trigger* trig = new Trigger();
 	trig->type = triggers::on_trigger_enter;
-	trig->t_zones = sf::RectangleShape(sf::Vector2f(max(x2, x1) * 64.f - min(x2, x1) * 64.f, max(y2, y1) * 64.f - min(y2, y1) * 64.f));
-	trig->t_zones.setPosition(min(x2, x1) * 64.f, min(y2, y1) * 64.f);
+	trig->t_zones = sf::RectangleShape(sf::Vector2f(max(fin.x, init.x) * game->pixels - min(fin.x, init.x) * game->pixels, max(fin.y, init.y) * game->pixels - min(fin.y, init.y) * game->pixels));
+	trig->t_zones.setPosition(min(init.x, fin.x) * game->pixels, min(init.y, fin.y) * game->pixels);
 	trig->t_zones.setFillColor(sf::Color::Color(0.f, 255.f, 0.f, 100.f));
 	trig->g_player = player;
 	return trig;
 }
 
-Trigger* Trigger::onTriggerExit(int x1, int y1, int x2, int y2, Player* player)
+Trigger* Trigger::onTriggerExit(sf::Vector2f init, sf::Vector2f fin, Player* player)
 {
 	Trigger* trig = new Trigger();
 	trig->type = triggers::on_triger_exit;
-	trig->t_zones = sf::RectangleShape(sf::Vector2f(max(x2, x1) * 64.f - min(x2, x1) * 64.f, max(y2, y1) * 64.f - min(y2, y1) * 64.f));
-	trig->t_zones.setPosition(min(x2, x1) * 64.f, min(y2, y1) * 64.f);
+	trig->t_zones = sf::RectangleShape(sf::Vector2f(max(fin.x, init.x) * game->pixels - min(fin.x, init.x) * game->pixels, max(fin.y, init.y) * game->pixels - min(fin.y, init.y) * game->pixels));
+	trig->t_zones.setPosition(min(init.x, fin.x) * game->pixels, min(init.y, fin.y) * game->pixels);
 	trig->t_zones.setFillColor(sf::Color::Color(0.f, 255.f, 0.f, 100.f));
 	trig->g_player = player;
 	return trig;
 }
 
-Trigger* Trigger::onTriggerStay(int x1, int y1, int x2, int y2, Player* player)
+Trigger* Trigger::onTriggerStay(sf::Vector2f init, sf::Vector2f fin, Player* player)
 {
 	Trigger* trig = new Trigger();
 	trig->type = triggers::on_trigger_stay;
-	trig->t_zones = sf::RectangleShape(sf::Vector2f(max(x2, x1) - min(x2, x1), max(y2, y1) - min(y2, y1)));
-	trig->t_zones.setPosition(min(x2, x1), min(y2, y1));
+	trig->t_zones = sf::RectangleShape(sf::Vector2f(max(fin.x, init.x) * game->pixels - min(fin.x, init.x) * game->pixels, max(fin.y, init.y) * game->pixels - min(fin.y, init.y) * game->pixels));
+	trig->t_zones.setPosition(min(init.x, fin.x) * game->pixels, min(init.y, fin.y) * game->pixels);
 	trig->t_zones.setFillColor(sf::Color::Color(0.f, 255.f, 0.f, 100.f));
 	trig->g_player = player;
 	return trig;
