@@ -2,9 +2,9 @@
 
 
 
-NPC::NPC(sf::Vector2f size)
+NPC::NPC(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name)
 {
-	p_shape.setSize(size);
+	Init(pos, anims, name);
 }
 
 NPC::NPC()
@@ -16,14 +16,18 @@ NPC::~NPC()
 {
 }
 
-void NPC::Init(sf::Vector2f pos)
+void NPC::Init(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name)
 {
-	Object::Init(pos);
+	Object::Init(pos, anims, name);
 }
 
 void NPC::Update(sf::Time deltaTime)
 {
 	Object::Update(deltaTime);
+}
+
+void NPC::handleInputs(sf::Keyboard::Key key, bool isPressed)
+{
 }
 
 void NPC::Render(sf::RenderWindow * game_window)

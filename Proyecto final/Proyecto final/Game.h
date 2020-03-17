@@ -12,7 +12,7 @@ public:
 	void run();
 	void Init();
 	void Destroy();
-	float pixels = 64.f;
+	float pixels = 32.f;
 private:
 	static Game* instance;
 	Game();
@@ -26,11 +26,12 @@ private:
 	friend class Player;
 	friend class Map;
 	friend class Map_Manager;
-	Player* g_player = new Player({ pixels, pixels });
-	Function_Manager FM;
-	NPC* g_npc = new NPC({ pixels, pixels });
-	Map_Manager mm;
+	friend class Trigger;
 	sf::RenderWindow mWindow;
 	bool mIsMovingUp = false, mIsMovingDown = false, mIsMovingLeft = false, mIsMovingRight = false;
 	sf::Time TimePerFrame = sf::seconds(1.f / 60.f);
+public:
+private:
+	Player* g_player;
+	Map_Manager mm;
 };

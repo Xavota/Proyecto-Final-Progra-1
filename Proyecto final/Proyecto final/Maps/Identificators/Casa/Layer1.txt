@@ -1,0 +1,3 @@
+Maps/Tiles/Floor.png
+16 12
+1 5 0

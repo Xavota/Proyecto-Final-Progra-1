@@ -1,0 +1,5 @@
+Animations/CharactersAnimations/May be it is.png
+12 8
+10
+idle_right
+10 2

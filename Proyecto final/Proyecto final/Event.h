@@ -20,8 +20,8 @@ public:
 	Event(Tag t, Info i);
 	~Event();
 	static Event DialogBox(string file_name, int pos);
-	static Event setSpeed(float* speed, Player* player);
-	static Event goToMap(string* map_name, sf::Vector2f* pos);
+	static Event setSpeed(float* speed, Object* player);
+	static Event goToMap(string* map_name, sf::Vector2i* pos);
 private:
 	friend class Function;
 	Tag tag;

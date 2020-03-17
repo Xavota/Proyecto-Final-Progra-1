@@ -14,23 +14,36 @@ Game::Game()
 void Game::Init()
 {
 	mWindow.create(sf::VideoMode(512, 512), "SFML Application");
-	g_npc->Init({ 6.f, 2.f });
-	g_npc->p_Animation().Init(g_npc->p_shape, .2f, "CharactersAnimations/May be it is.png", 12, 8);
-	g_npc->p_Animation().setAnimation({ sf::Vector2u{1, 0} }, "idle_abajo", Animator_Manager::idle);
-	g_npc->p_Animation().SetState("idle_abajo");
-	g_player->Init({ 0.f, 0.f });
-	FM.Init();
-	FM.CreateFunction(&mWindow, { Event::setSpeed(new float(0.f), g_player)
-	, Event::DialogBox("DialogosNPC/generico.txt", 1)
-	, Event::DialogBox("DialogosNPC/generico.txt", 2)
-	, Event::setSpeed(new float(100.f), g_player) }, "Inicio");
-	FM.CreateFunction(&mWindow, { Event::goToMap(new string("Inicio"), new sf::Vector2f{ 0.f, 0.f }) }, "Ir a mapa");
-	FM.CreateTrigger(Trigger::onTriggerEnter({ 2, 2 }, { 4, 4 }, g_player), "Inicio");
-	FM.CreateTrigger(Trigger::onTriggerExit({ 2, 2 }, { 4, 4 }, g_player), "Inicio");
-	FM.CreateTrigger(Trigger::onInteract(g_npc, g_player), "Ir a mapa");
-	mm.AddMap(Map({ 20.f, 20.f }, vector<Map::Layer>{ Map::Layer{"Maps/Identificators/Principal_layer1.txt", "Maps/Layers/Layer1.txt", 1}, 
-		Map::Layer{ "Maps/Identificators/Principal_layer2.txt", "Maps/Layers/Layer2.txt", 2 } }, &mWindow), "Inicio");
-	mm.GoToMap("Inicio", { 0.f, 0.f });
+	mm.AddMap(Map({ 20.f, 20.f }, { Map::Layer{ "Maps/Layers/Inicio/Layer1.txt", 1 },
+		Map::Layer{ "Maps/Layers/Inicio/Layer2.txt", 2 } }, &mWindow), "Inicio");
+	mm.AddMap(Map({ 10.f, 10.f }, { Map::Layer{ "Maps/Layers/Casa/Layer1.txt", 1 },
+		Map::Layer{ "Maps/Layers/Casa/Layer2.txt", 2 },
+		Map::Layer{ "Maps/Layers/Casa/Layer3.txt", 3 } }, &mWindow), "Casa");
+	mm.getMap("Inicio").AddNPC(new NPC({ 6.f, 2.f }, { 
+		Animator_Manager::Animation{"Animations/Animations/Generico/Idle_down.txt", Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::down},
+		Animator_Manager::Animation{"Animations/Animations/Generico/Idle_up.txt", Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::up}, 
+		Animator_Manager::Animation{"Animations/Animations/Generico/Idle_left.txt", Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::left}, 
+		Animator_Manager::Animation{"Animations/Animations/Generico/Idle_right.txt", Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::right} },
+		"Generico"));
+	g_player = new Player({ 0.f, 0.f }, { 
+		Animator_Manager::Animation{"Animations/Animations/Principal/Movement_down.txt", Animator_Manager::AnimationTypes::movement, Animator_Manager::AnimationFace::down},
+		Animator_Manager::Animation{"Animations/Animations/Principal/Movement_up.txt", Animator_Manager::AnimationTypes::movement, Animator_Manager::AnimationFace::up} ,
+		Animator_Manager::Animation{"Animations/Animations/Principal/Movement_left.txt", Animator_Manager::AnimationTypes::movement, Animator_Manager::AnimationFace::left} ,
+		Animator_Manager::Animation{"Animations/Animations/Principal/Movement_right.txt", Animator_Manager::AnimationTypes::movement, Animator_Manager::AnimationFace::right} ,
+		Animator_Manager::Animation{"Animations/Animations/Principal/Idle_down.txt", Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::down} ,
+		Animator_Manager::Animation{"Animations/Animations/Principal/Idle_up.txt", Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::up} ,
+		Animator_Manager::Animation{"Animations/Animations/Principal/Idle_left.txt", Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::left} ,
+		Animator_Manager::Animation{"Animations/Animations/Principal/Idle_right.txt", Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::right} },
+		"Principal");
+	/*mm.getMap("Inicio").FM->CreateFunction(Trigger::onTriggerEnter({ 2, 2 }, { 4, 4 }), Function("Function_Manager/Functions/Inicial/Inicial.txt"));
+	mm.getMap("Inicio").FM->CreateFunction(Trigger::onTriggerExit({ 2, 2 }, { 4, 4 }), Function("Function_Manager/Functions/Inicial/Inicial.txt"));
+	mm.getMap("Inicio").FM->CreateFunction(Trigger::onInteract(&mm.getMap("Inicio").GetNPC("Generico")), Function("Function_Manager/Functions/Inicial/Inicial.txt"));
+	mm.getMap("Inicio").FM->CreateFunction(Trigger::onInteract({ 4, 3 }), Function("Function_Manager/Functions/Inicial/Ir a casa.txt"));
+	mm.getMap("Casa").FM->CreateFunction(Trigger::onMapEnter(&mm.getMap("Casa")), Function("Function_Manager/Functions/Casa/Inicial.txt"));
+	mm.getMap("Casa").FM->CreateFunction(Trigger::onInteract({ 5, 10 }), Function("Function_Manager/Functions/Casa/Ir a mapa.txt"));*/
+	mm.getMap("Inicio").setMapTriggers("Function_Manager/Triggers/Inicial.txt");
+	mm.getMap("Casa").setMapTriggers("Function_Manager/Triggers/Casa.txt");
+	mm.GoToMap("Inicio", { 0, 0 });
 }
 
 void Game::run()
@@ -53,8 +66,8 @@ void Game::run()
 
 void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 {
-	FM.handleInputs(key, isPressed);
 	g_player->handleInputs(key, isPressed);
+	mm.handleInputs(key, isPressed);
 }
 
 void Game::processEvents()
@@ -79,9 +92,7 @@ void Game::processEvents()
 
 void Game::update(sf::Time deltaTime)
 {
-	FM.Update(deltaTime);
 	mm.Update(deltaTime);
-	g_npc->Update(deltaTime);
 	g_player->Update(deltaTime);
 }
 
@@ -89,12 +100,13 @@ void Game::render()
 {
 	mWindow.clear();
 	mm.Render(&mWindow);
-	g_npc->Render(&mWindow);
 	g_player->Render(&mWindow);
-	FM.Render(&mWindow);
+	mm.Render(&mWindow);
 	mWindow.display();
 }
 
 void Game::Destroy()
 {
+	mm.Destroy();
+	g_player->Destroy();
 }

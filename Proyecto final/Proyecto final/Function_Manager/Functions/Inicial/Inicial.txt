@@ -1,0 +1,4 @@
+1 set_speed (0.0 "Principal") 2
+2 dialog_box ("DialogosNPC/generico.txt" 1) 3
+3 dialog_box ("DialogosNPC/generico.txt" 2) 4
+4 set_speed (100.0 "Principal") 0

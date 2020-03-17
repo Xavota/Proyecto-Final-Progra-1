@@ -2,9 +2,9 @@
 #include "Game.h"
 
 
-Player::Player(sf::Vector2f size)
+Player::Player(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name)
 {
-	p_shape.setSize(size);
+	Init(pos, anims, name);
 }
 
 
@@ -12,40 +12,32 @@ Player::~Player()
 {
 }
 
-void Player::Init(sf::Vector2f pos)
+void Player::Init(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name)
 {
-	Object::Init(pos);
-	p_AM.Init(p_shape, .2f, "CharactersAnimations/May be it is.png", 12, 8);
-	p_AM.setAnimation({ sf::Vector2u{9, 0}, sf::Vector2u{10, 0}, sf::Vector2u{11, 0}, sf::Vector2u{10, 0} }, "abajo", Animator_Manager::movement);
-	p_AM.setAnimation({ sf::Vector2u{9, 3}, sf::Vector2u{10, 3}, sf::Vector2u{11, 3}, sf::Vector2u{10, 3} }, "arriba", Animator_Manager::movement);
-	p_AM.setAnimation({ sf::Vector2u{9, 2}, sf::Vector2u{10, 2}, sf::Vector2u{11, 2}, sf::Vector2u{10, 2} }, "derecha", Animator_Manager::movement);
-	p_AM.setAnimation({ sf::Vector2u{9, 1}, sf::Vector2u{10, 1}, sf::Vector2u{11, 1}, sf::Vector2u{10, 1} }, "izquierda", Animator_Manager::movement);
-	p_AM.setAnimation({ sf::Vector2u{10, 0} }, "idle_abajo", Animator_Manager::idle);
-	p_AM.setAnimation({ sf::Vector2u{10, 3} }, "idle_arriba", Animator_Manager::idle);
-	p_AM.setAnimation({ sf::Vector2u{10, 2} }, "idle_derecha", Animator_Manager::idle);
-	p_AM.setAnimation({ sf::Vector2u{10, 1} }, "idle_izquierda", Animator_Manager::idle);
-	p_AM.SetState("idle_abajo");
+	Object::Init(pos, anims, name);
 }
 
 void Player::Update(sf::Time deltaTime)
 {
 	Object::Update(deltaTime);
-	sf::Vector2f movement;
-	if (mIsMovingUp) {
-		p_Animation().SetState("arriba");
-		movement.y -= 1;
-	}
-	if (mIsMovingDown) {
-		p_Animation().SetState("abajo");
-		movement.y += 1;
-	}
-	if (mIsMovingLeft) {
-		p_Animation().SetState("izquierda");
-		movement.x -= 1;
-	}
-	if (mIsMovingRight) {
-		p_Animation().SetState("derecha");
-		movement.x += 1;
+	sf::Vector2f movement = { 0.f, 0.f };
+	if (Speed != 0) {
+		if (mIsMovingUp) {
+			p_Animation().SetState(Animator_Manager::AnimationTypes::movement, Animator_Manager::AnimationFace::up);
+			movement.y -= 1;
+		}
+		if (mIsMovingDown) {
+			p_Animation().SetState(Animator_Manager::AnimationTypes::movement, Animator_Manager::AnimationFace::down);
+			movement.y += 1;
+		}
+		if (mIsMovingLeft) {
+			p_Animation().SetState(Animator_Manager::AnimationTypes::movement, Animator_Manager::AnimationFace::left);
+			movement.x -= 1;
+		}
+		if (mIsMovingRight) {
+			p_Animation().SetState(Animator_Manager::AnimationTypes::movement, Animator_Manager::AnimationFace::right);
+			movement.x += 1;
+		}
 	}
 	move(movement * deltaTime.asSeconds());
 }

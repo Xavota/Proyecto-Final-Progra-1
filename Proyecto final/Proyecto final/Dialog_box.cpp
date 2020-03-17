@@ -82,12 +82,16 @@ void Dialog_box::Init(sf::RenderWindow * window, sf::Color box_color, sf::Color 
 		db_edge[i].setSize(i % 2 == 0 ? sf::Vector2f(db_game_window->getSize().x - 5.f, 5.f) : sf::Vector2f(5.f, 80.f));
 		db_edge[i].setPosition(db_Rectangle.getPosition() + sf::Vector2f(i != 1 ? -2.5f : db_game_window->getSize().x - 10.f, i != 2 ? -77.5f : -2.5f));
 	}
-	db_text.setPosition(db_Rectangle.getPosition() + sf::Vector2f(15.f, -75.f));
+	db_text.setPosition(db_Rectangle.getPosition() + sf::Vector2f(15.f, db_Rectangle.getSize().y - 15.f));
 	setBoxColor(box_color);
 	setEdgeColor(edge_color);
 	setTextColor(text_color);
 	setTextFont(text_font_file);
 	setTexSize(text_size);
+	setActive(false);
+	db_text.setString("Hola que pedo.\nHola que pedo.");
+	db_Normal_Size = { db_game_window->getSize().x - 40.f, db_text.getGlobalBounds().height };
+	db_y_size = db_text.getGlobalBounds().height;
 }
 
 void Dialog_box::Update(sf::Time deltaTime)
@@ -105,11 +109,47 @@ void Dialog_box::Update(sf::Time deltaTime)
 		}
 		Time = 0;
 	}
+	if (db_text.getGlobalBounds().width > db_Normal_Size.x) {
+		db_text.setString(AdjustText(db_text.getString()));
+	}
+	db_Rectangle.setSize({ db_Rectangle.getSize().x, db_Normal_Size.y >= db_text.getGlobalBounds().height ? db_Normal_Size.y + 20.f : db_text.getGlobalBounds().height + 20.f });
+	db_Rectangle.setOrigin(0, db_Rectangle.getSize().y);
 	db_Rectangle.setPosition({ db_game_window->getView().getCenter().x + 5.f - db_game_window->getSize().x / 2, db_game_window->getView().getCenter().y - 5.f  + db_game_window->getSize().y / 2 });
 	for (int i = 0; i < 4; i++) {
-		db_edge[i].setPosition(db_Rectangle.getPosition() + sf::Vector2f(i != 1 ? -2.5f : db_game_window->getSize().x - 10.f, i != 2 ? -77.5f : -2.5f));
+		db_edge[i].setSize(i % 2 == 0 ? sf::Vector2f{ db_Rectangle.getSize().x + 5.f, 5.f } : sf::Vector2f{ 5.f, db_Rectangle.getSize().y + 5.f });
+		db_edge[i].setPosition(db_Rectangle.getPosition() + sf::Vector2f(i != 1 ? -2.5f : db_Rectangle.getSize().x - 2.5f, i != 2 ? - db_Rectangle.getSize().y - 2.5f : -2.5f));
 	}
-	db_text.setPosition(db_Rectangle.getPosition() + sf::Vector2f(15.f, -75.f));
+	db_text.setPosition(db_Rectangle.getPosition() + sf::Vector2f(15.f, - db_Rectangle.getSize().y + 10.f));
+}
+
+string Dialog_box::AdjustText(string s)
+{
+	string newS;
+	bool salto = false, Espacio = false;
+	for (int i = s.size() - 1; i >= 0; i--) {
+		if (s[i] == ' ') {
+			Espacio = true;
+			break;
+		}
+		if (s[i] == '\n')
+			break;
+	}
+	for (int i = s.size() - 1; i >= 0; i--) {
+		if (!Espacio) {
+			newS = s[i];
+			newS = '\n' + newS;
+			salto = true;
+			Espacio = true;
+		}
+		else if (!salto && s[i] == ' ') {
+			salto = true;
+			newS = '\n' + newS;
+		}
+		else {
+			newS = s[i] + newS;
+		}
+	}
+	return newS;
 }
 
 void Dialog_box::Render(sf::RenderWindow * window)

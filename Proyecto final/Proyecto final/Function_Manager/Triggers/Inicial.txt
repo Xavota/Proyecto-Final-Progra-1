@@ -1,0 +1,4 @@
+on_trigger_enter ({2 2} {4 4}) "Function_Manager/Functions/Inicial/Inicial.txt"
+on_trigger_exit ({2 2} {4 4}) "Function_Manager/Functions/Inicial/Inicial.txt"
+on_interact ("Generico") "Function_Manager/Functions/Inicial/Inicial.txt"
+on_interact ({4 3}) "Function_Manager/Functions/Inicial/Ir a casa.txt"

@@ -1,0 +1,1 @@
+on_interact ({5 10}) "Function_Manager/Functions/Casa/Ir a mapa.txt"

@@ -1,0 +1,5 @@
+Animations/CharactersAnimations/Characters.png
+12 8
+10
+idle_right
+7 6

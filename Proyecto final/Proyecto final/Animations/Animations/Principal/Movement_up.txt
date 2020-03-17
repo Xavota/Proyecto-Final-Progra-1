@@ -1,0 +1,8 @@
+Animations/CharactersAnimations/May be it is.png
+12 8
+.2
+movement_up
+9 3
+10 3
+11 3
+10 3
