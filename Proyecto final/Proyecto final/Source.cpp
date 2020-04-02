@@ -4,6 +4,8 @@
 
 // Sólo trata de interactuar con lo que veas. Difruta :D
 // Todo el juego se modifica desde los archivos (casi todo) lo seguré avanzando fuera de clases
+// Una acalaración: de el menú de pausa sólo funcionan el botón de reanudar, guardar, cargar y salir
+//				    y sólo se puede guardar y cargar de un archivo (por ahora)
 
 int main()
 {
