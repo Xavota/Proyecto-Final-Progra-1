@@ -9,7 +9,7 @@ Pause_Menu::~Pause_Menu()
 {
 }
 
-void Pause_Menu::Init(sf::RenderWindow* window)
+void Pause_Menu::Init(sf::RenderWindow* window) // Inicializa los objetos necesarios del menú de pausa
 {
 	game = Game::getInstance();
 	pm_window = window;
@@ -52,10 +52,10 @@ void Pause_Menu::Init(sf::RenderWindow* window)
 	pm_money_edge.setPosition(pm_money_box.getPosition() + sf::Vector2f(2.5f, 2.5f));
 }
 
-void Pause_Menu::Update(sf::Time deltaTime)
+void Pause_Menu::Update(sf::Time deltaTime) // Cada ciclo
 {
 	int btn_pressed = pm_bm.Update(deltaTime);
-	switch (btn_pressed)
+	switch (btn_pressed) // Según el número devuelto por el Update (provicional) ejecuta la acción
 	{
 	case 0:
 		game->pause = false;
@@ -93,14 +93,14 @@ void Pause_Menu::Update(sf::Time deltaTime)
 	pm_money_edge.setPosition(pm_money_box.getPosition() + sf::Vector2f(2.5f, 2.5f));
 }
 
-void Pause_Menu::handleInputs(sf::Keyboard::Key key, bool ispressed)
+void Pause_Menu::handleInputs(sf::Keyboard::Key key, bool ispressed) // Convierte los inputs en acciones y ejecuta los handle inputs de sus objetos
 {
 	if (game->pause) {
 		pm_bm.handleInputs(key, ispressed);
 	}
 }
 
-void Pause_Menu::Render(sf::RenderWindow * window)
+void Pause_Menu::Render(sf::RenderWindow * window) // Renderiza los objetos del menú
 {
 	if (game->pause) {
 		window->draw(pm_box);
@@ -111,6 +111,12 @@ void Pause_Menu::Render(sf::RenderWindow * window)
 	}
 }
 
-void Pause_Menu::Destroy()
+void Pause_Menu::Destroy() // Libera memoria
 {
+	if (pm_window != nullptr) {
+		pm_window = nullptr;
+	}
+	if (game != nullptr) {
+		game = nullptr;
+	}
 }

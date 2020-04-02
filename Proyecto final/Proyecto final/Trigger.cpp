@@ -6,28 +6,40 @@ Trigger::Trigger()
 {
 }
 
-
 Trigger::~Trigger()
 {
 }
-void Trigger::Init()
+
+void Trigger::Init() // Inicializa el trigger
 {
 }
 
-void Trigger::Update(sf::Time deltaTime)
+void Trigger::Update(sf::Time deltaTime) // Cada ciclo
 {
 }
 
-void Trigger::Render(sf::RenderWindow * window)
+void Trigger::Render(sf::RenderWindow * window) // Renderiza lo que necesite
 {
 	window->draw(t_zones);
 }
 
-void Trigger::Destory()
+void Trigger::Destory() // Libera memoria
 {
+	if (g_player != nullptr) {
+		g_player = nullptr;
+	}
+	if (t_Interactuable != nullptr) {
+		t_Interactuable = nullptr;
+	}
+	if (t_map != nullptr) {
+		t_map = nullptr;
+	}
+	if (game != nullptr) {
+		game = nullptr;
+	}
 }
 
-void Trigger::handleInputs(sf::Keyboard::Key key, bool isPressed)
+void Trigger::handleInputs(sf::Keyboard::Key key, bool isPressed) // Convierte inputs en acciones
 {
 	if (key == sf::Keyboard::Return) {
 		if (!key_pressed) {
@@ -40,9 +52,9 @@ void Trigger::handleInputs(sf::Keyboard::Key key, bool isPressed)
 	}
 }
 
-bool Trigger::TriggerIsMet()
+bool Trigger::TriggerIsMet() // Regresa si el trigger se cumplió
 {
-	switch (type)
+	switch (type) // Según el tipo de trigger, revisa si lo que necesita cumplirse se cumple
 	{
 	case Trigger::on_trigger_enter:
 		if (!inside) {
@@ -132,7 +144,7 @@ bool Trigger::TriggerIsMet()
 	return false;
 }
 
-Trigger Trigger::onTriggerEnter(sf::Vector2i init, sf::Vector2i fin)
+Trigger Trigger::onTriggerEnter(sf::Vector2i init, sf::Vector2i fin) // Devuelve un trigger con la etiqueta "on triger enter"
 {
 	Trigger trig = Trigger();
 	trig.type = triggers::on_trigger_enter;
@@ -143,7 +155,7 @@ Trigger Trigger::onTriggerEnter(sf::Vector2i init, sf::Vector2i fin)
 	return trig;
 }
 
-Trigger Trigger::onTriggerExit(sf::Vector2i init, sf::Vector2i fin)
+Trigger Trigger::onTriggerExit(sf::Vector2i init, sf::Vector2i fin) // Devuelve un trigger con la etiqueta "on triger exit"
 {
 	Trigger trig = Trigger();
 	trig.type = triggers::on_triger_exit;
@@ -154,7 +166,7 @@ Trigger Trigger::onTriggerExit(sf::Vector2i init, sf::Vector2i fin)
 	return trig;
 }
 
-Trigger Trigger::onTriggerStay(sf::Vector2i init, sf::Vector2i fin)
+Trigger Trigger::onTriggerStay(sf::Vector2i init, sf::Vector2i fin) // Devuelve un trigger con la etiqueta "on triger stay"
 {
 	Trigger trig = Trigger();
 	trig.type = triggers::on_trigger_stay;
@@ -165,22 +177,22 @@ Trigger Trigger::onTriggerStay(sf::Vector2i init, sf::Vector2i fin)
 	return trig;
 }
 
-Trigger Trigger::onKeyPressed()
+Trigger Trigger::onKeyPressed() // Devuelve un trigger con la etiqueta "on key pressed"
 {
 	return Trigger();
 }
 
-Trigger Trigger::onKeyReleased()
+Trigger Trigger::onKeyReleased() // Devuelve un trigger con la etiqueta "on key released"
 {
 	return Trigger();
 }
 
-Trigger Trigger::onKey()
+Trigger Trigger::onKey() // Devuelve un trigger con la etiqueta "on key"
 {
 	return Trigger();
 }
 
-Trigger Trigger::onInteract(Object * interactuable)
+Trigger Trigger::onInteract(Object * interactuable) // Devuelve un trigger con la etiqueta "on interact"
 {
 	Trigger trig = Trigger();
 	trig.type = triggers::on_interact;
@@ -189,7 +201,7 @@ Trigger Trigger::onInteract(Object * interactuable)
 	return trig;
 }
 
-Trigger Trigger::onInteract(sf::Vector2i pos)
+Trigger Trigger::onInteract(sf::Vector2i pos) // Devuelve un trigger con la etiqueta "on pos interact"
 {
 	Trigger trig = Trigger();
 	trig.type = triggers::on_pos_interact;
@@ -198,7 +210,7 @@ Trigger Trigger::onInteract(sf::Vector2i pos)
 	return trig;
 }
 
-Trigger Trigger::onMapEnter(Map * map)
+Trigger Trigger::onMapEnter(Map * map) // Devuelve un trigger con la etiqueta "on map enter"
 {
 	Trigger trig = Trigger();
 	trig.type = triggers::on_map_enter;

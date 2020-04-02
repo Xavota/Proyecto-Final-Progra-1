@@ -1,27 +1,25 @@
 #include "Player.h"
 #include "Game.h"
 
-
 Player::Player(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name)
 {
 	Init(pos, anims, name);
 }
 
-
 Player::~Player()
 {
 }
 
-void Player::Init(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name)
+void Player::Init(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name) // Inicializa al jugador como objeto
 {
 	Object::Init(pos, anims, name);
 }
 
-void Player::Update(sf::Time deltaTime)
+void Player::Update(sf::Time deltaTime) // Cada cilco
 {
-	Object::Update(deltaTime);
+	Object::Update(deltaTime); // Lo updatea como objeto
 	sf::Vector2f movement = { 0.f, 0.f };
-	if (Speed != 0) {
+	if (Speed != 0) { // Revisa que tenga velocidad el jugador. Depende a dónde se mueva le pone ese estado
 		if (mIsMovingUp) {
 			p_Animation().SetState(Animator_Manager::AnimationTypes::movement, Animator_Manager::AnimationFace::up);
 			movement.y -= 1;
@@ -39,10 +37,10 @@ void Player::Update(sf::Time deltaTime)
 			movement.x += 1;
 		}
 	}
-	move(movement * deltaTime.asSeconds());
+	move(movement * deltaTime.asSeconds()); // Mueve al jugador
 }
 
-void Player::handleInputs(sf::Keyboard::Key key, bool isPressed)
+void Player::handleInputs(sf::Keyboard::Key key, bool isPressed) // Convierte los inputs en acciones
 {
 	if (key == sf::Keyboard::W) {
 		mIsMovingUp = isPressed;
@@ -58,16 +56,17 @@ void Player::handleInputs(sf::Keyboard::Key key, bool isPressed)
 	}
 }
 
-void Player::Render(sf::RenderWindow* game_window)
+void Player::Render(sf::RenderWindow* game_window) // Renderiza al jugador como Objeto
 {
 	Object::Render(game_window);
 }
 
-void Player::Destroy()
+void Player::Destroy() // Libera la memoria
 {
+	Object::Destroy();
 }
 
-void Player::move(sf::Vector2f p_move)
+void Player::move(sf::Vector2f p_move) // Mueve al jugador
 {
 	p_movement = p_move * Speed;
 }
