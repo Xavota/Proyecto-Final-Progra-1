@@ -1,0 +1,2 @@
+Los archivos se almacenan en carpetas según su utilidad.
+Pronto haré que sólo tengas que modificarlos desde ahí para modificar el juego entero, pero por ahora cosas como los mapas, los triggers de los mapas y las animaciones de los objetos se tienen que integrar desde el código. Se ve claramente donde (espero) (todo se pone en el Init dentro del Game).
