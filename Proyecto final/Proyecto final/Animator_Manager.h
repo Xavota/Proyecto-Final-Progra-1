@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 using namespace std;
-class Animator_Manager
+class Animator_Manager // Hace posible las animaciones de objetos
 {
 public:
 	enum AnimationTypes {
@@ -15,7 +15,7 @@ public:
 	enum AnimationFace {
 		up, down, left, right
 	};
-	class Animation {
+	class Animation { // Los datos necesarios para mostrar una animación
 	public:
 		Animation(string file_name, AnimationTypes type, AnimationFace face) { a_file_name = file_name; a_type = type; a_face = face; }
 	private:
@@ -34,22 +34,22 @@ public:
 	};
 	Animator_Manager();
 	~Animator_Manager();
-	void setAnimation(Animation& anim);
-	void SetState(const string& a);
-	void SetState(Animation a);
-	void SetState(AnimationTypes type, AnimationFace face);
-	void SetState(AnimationTypes type);
-	void SetState(AnimationFace face);
-	void SetVelocity(float v);
-	void SetTexture(sf::Texture * texture, int x, int y);
-	string getState();
-	Animation& getAnimation(const string& name);
-	Animation& getAnimation(AnimationTypes type, AnimationFace face);
-	Animation& getAnimation();
-	void Init(sf::RectangleShape& AM_a_o);
-	void Update(sf::Time deltaTime);
-	void Render();
-	void Destroy();
+	void setAnimation(Animation& anim); // Agerga una animación
+	void SetState(const string& a); // Setea el estado actual para activar esa animación dando su nombre
+	void SetState(Animation a); // Setea el estado actual para activar esa animación dando la animación 
+	void SetState(AnimationTypes type, AnimationFace face); // Setea el estado actual para activar esa animación dando su tipo y dirección
+	void SetState(AnimationTypes type); // Setea el estado actual para activar esa animación dando tipo y manteniendo la dirección
+	void SetState(AnimationFace face); // Setea el estado actual para activar esa animación dando su dirección y manteniendo su tipo
+	void SetVelocity(float v); // Setea la velocidad de los fotogramas de la animación
+	void SetTexture(sf::Texture * texture, int x, int y); // Setea la textura donde está la animación
+	string getState(); // Devuelve el nombre del estado actual
+	Animation& getAnimation(const string& name); // Devuelve la animación según su nombre
+	Animation& getAnimation(AnimationTypes type, AnimationFace face); // Devuelve la animación según su tipo y dirección
+	Animation& getAnimation(); // Devuelve la animación actual
+	void Init(sf::RectangleShape& AM_a_o); // Inicializa las variables
+	void Update(sf::Time deltaTime); // Cada ciclio
+	void Render(); // Renderiza lo necesario
+	void Destroy(); // Libera la memoria
 	float Time = 0;
 private:
 	vector<Animation> AM_Animations;
@@ -60,5 +60,4 @@ private:
 	sf::Vector2u AM_texture_size;
 	float AM_velocity;
 	int AM_foto_gram;
-	void getLine(istream& is, string& s);
 };

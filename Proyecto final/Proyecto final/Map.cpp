@@ -15,12 +15,12 @@ Map::~Map()
 {
 }
 
-void Map::Init(sf::Vector2f size, vector<Layer> layers, sf::RenderWindow* w)
+void Map::Init(sf::Vector2f size, vector<Layer> layers, sf::RenderWindow* w) // Inicializa las variables necesarias
 {
 	game = Game::getInstance();
 	map_size = size;
 	map_layers = layers;
-	for (int i = 0; i < map_layers.size(); i++) {
+	for (int i = 0; i < map_layers.size(); i++) { // Lee los archivos de cada layer para agregar los cuadros del mapa y darles la textura correspondiente
 		ifstream lay_layout{ map_layers[i].l_layout_file };
 		string lay_ident_file;
 		getline(lay_layout, lay_ident_file);
@@ -69,17 +69,17 @@ void Map::Init(sf::Vector2f size, vector<Layer> layers, sf::RenderWindow* w)
 	FM = new Function_Manager();
 }
 
-void Map::AddObject(Object* obj)
+void Map::AddObject(Object* obj) // Agrega un objeto al mapa
 {
 	map_objs.push_back(obj);
 }
 
-void Map::AddNPC(NPC* npc)
+void Map::AddNPC(NPC* npc) // Agrega un NPC al mapa
 {
 	map_npcs.push_back(npc);
 }
 
-Object & Map::GetObject(string obj_name)
+Object & Map::GetObject(string obj_name) // Regresa un objeto según su nombre si existe
 {
 	for (Object* obj : map_objs) {
 		if (obj->o_name == obj_name)
@@ -88,7 +88,7 @@ Object & Map::GetObject(string obj_name)
 	throw runtime_error("Object not found");
 }
 
-NPC & Map::GetNPC(string npc_name)
+NPC & Map::GetNPC(string npc_name) // Regresa un NPC según su nombre si existe
 {
 	for (NPC* npc : map_npcs) {
 		if (npc->o_name == npc_name)
@@ -97,9 +97,9 @@ NPC & Map::GetNPC(string npc_name)
 	throw runtime_error("NPC not found");
 }
 
-void Map::Update(sf::Time deltaTime)
+void Map::Update(sf::Time deltaTime) // Cada ciclo
 {
-	if (inMap) {
+	if (inMap) { // Si está en el mapa
 		sf::Vector2f camera_left_up = window->getView().getCenter() - sf::Vector2f{ window->getSize().x / 2.f, window->getSize().y / 2.f };
 		sf::Vector2f camera_right_down = window->getView().getCenter() + sf::Vector2f{ window->getSize().x / 2.f, window->getSize().y / 2.f };
 		if (window->getSize().x > map_size.x * game->pixels) {
@@ -145,7 +145,7 @@ void Map::Update(sf::Time deltaTime)
 	}
 }
 
-void Map::handleInputs(sf::Keyboard::Key key, bool ispressed)
+void Map::handleInputs(sf::Keyboard::Key key, bool ispressed) // Convierte los inputs en acciones, llama los inputs de sus objetos
 {
 	if (inMap) {
 		for (NPC * npc : map_npcs) {
@@ -158,145 +158,98 @@ void Map::handleInputs(sf::Keyboard::Key key, bool ispressed)
 	}
 }
 
-void Map::GoToMap(sf::Vector2i pos)
+void Map::GoToMap(sf::Vector2i pos) // Te lleva al mapa actual en la posición dada
 {
 	inMap = true;
 	game->g_player->p_shape.setPosition(pos.x * game->pixels, pos.y * game->pixels);
 	game->g_player->o_posAnterior = game->g_player->p_shape.getPosition();
 }
 
-void Map::OutOfMap()
+void Map::OutOfMap() // Te saca del mapa
 {
 	inMap = false;
 }
 
-bool Map::isActive()
+bool Map::isActive() // ¿El mapa está activo?
 {
 	return inMap;
 }
 
-void Map::setMapTriggers(string triggers_file_name)
+void Map::setMapTriggers(string triggers_file_name) // Agrega los triggers del mapa desde el archivo
 {
 	ifstream triggers_file{ triggers_file_name };
 	while (!triggers_file.eof())
 	{
 		string trigger_type;
 		char c = 0;
+		Trigger trig;
 		triggers_file >> trigger_type;
+		triggers_file >> noskipws;
+		while (c != '(' && !triggers_file.eof())
+		{
+			triggers_file >> c;
+		}
+		triggers_file >> skipws;
 		if (trigger_type == "on_trigger_enter") {
-			triggers_file >> noskipws;
-			while (c != '(')
-			{
-				triggers_file >> c;
-			}
-			triggers_file >> skipws;
 			sf::Vector2i pos_init, pos_finale;
 			triggers_file >> pos_init >> pos_finale;
-			triggers_file >> noskipws;
-			while (c != ')')
-			{
-				triggers_file >> c;
-			}
-			while (c != '"')
-			{
-				triggers_file >> c;
-			}
-			string func_file_name = "";
-			triggers_file >> c;
-			while (c != '"')
-			{
-				func_file_name += c;
-				triggers_file >> c;
-			}
-			triggers_file >> skipws;
-			FM->CreateFunction(Trigger::onTriggerEnter(pos_init, pos_finale), Function(func_file_name));
+			trig = Trigger::onTriggerEnter(pos_init, pos_finale);
 		}
-		if (trigger_type == "on_trigger_exit") {
-			triggers_file >> noskipws;
-			while (c != '(')
-			{
-				triggers_file >> c;
-			}
-			triggers_file >> skipws;
+		else if (trigger_type == "on_trigger_exit") {
 			sf::Vector2i pos_init, pos_finale;
 			triggers_file >> pos_init >> pos_finale;
-			triggers_file >> noskipws;
-			while (c != ')')
-			{
-				triggers_file >> c;
-			}
-			while (c != '"')
-			{
-				triggers_file >> c;
-			}
-			string func_file_name = "";
-			triggers_file >> c;
-			while (c != '"')
-			{
-				func_file_name += c;
-				triggers_file >> c;
-			}
-			triggers_file >> skipws;
-			FM->CreateFunction(Trigger::onTriggerExit
-(pos_init, pos_finale), Function(func_file_name));
+			trig = Trigger::onTriggerExit(pos_init, pos_finale);
 		}
-		if (trigger_type == "on_interact") {
-			bool onPos = false;
-			sf::Vector2i pos;
-			string Obj_name;
-			triggers_file >> noskipws;
-			while (c != '(')
-			{
-				triggers_file >> c;
-			}
-			triggers_file >> c;
+		else if (trigger_type == "on_interact") {
+			triggers_file >> noskipws >> c >> skipws;
 			if (c == '{') {
-				onPos = true;
 				triggers_file.putback(c);
-				triggers_file >> skipws;
+				sf::Vector2i pos;
 				triggers_file >> pos;
+				trig = Trigger::onInteract(pos);
 			}
 			else if (c == '"') {
-				triggers_file >> c;
-				while (c != '"')
-				{
-					Obj_name += c;
-					triggers_file >> c;
-				}
-				triggers_file >> skipws;
+				triggers_file.putback(c);
+				s_string Obj_name;
+				triggers_file >> Obj_name;
+				trig = Trigger::onInteract(Object::getObject(Obj_name.str));
 			}
+		}
+		else if (trigger_type == "on_map_enter") {
+			trig = Trigger::onMapEnter(this);
+		}
+		else {
+			string rest;
 			triggers_file >> noskipws;
-			while (c != ')')
-			{
+			while (!triggers_file.eof()) {
 				triggers_file >> c;
-			}
-			while (c != '"')
-			{
-				triggers_file >> c;
-			}
-			string func_file_name = "";
-			triggers_file >> c;
-			while (c != '"')
-			{
-				func_file_name += c;
-				triggers_file >> c;
+				rest += c;
 			}
 			triggers_file >> skipws;
-			if (onPos)
-				FM->CreateFunction(Trigger::onInteract(pos), Function(func_file_name));
-			else
-				FM->CreateFunction(Trigger::onInteract(Object::getObject(Obj_name)), Function(func_file_name));
+			if (rest != "") {
+				cout << rest <<  ": no detectado como funcion" <<  endl;
+			}
+			break;
 		}
+		triggers_file >> noskipws;
+		while (c != ')')
+		{
+			triggers_file >> c;
+		}
+		triggers_file >> skipws;
+		s_string func_file_name;
+		triggers_file >> func_file_name;
+		FM->CreateFunction(trig, Function(func_file_name.str));
 	}
 }
 
-void Map::Render(sf::RenderWindow * window)
+void Map::Render(sf::RenderWindow * window) // Renderiza todo el mapa
 {
-	if (inMap) {
-		if (RenderFase1) {
-			for (int i = 0; i < map_tiles_grids.size(); i++) {
-				if (map_layers[i].l_layer != 3) {
-					for (vector<sf::RectangleShape> y : map_tiles_grids[i]) {
+	if (inMap) { // Si está en el mapa
+		if (RenderFase1) { // Si es la primera fase de renderizado (por debajo del jugador)
+			for (int i = 0; i < map_tiles_grids.size(); i++) { // Por cada capa del mapa
+				if (map_layers[i].l_layer != 3) { // Si la layer no es 3 (por arriba del jugador)
+					for (vector<sf::RectangleShape> y : map_tiles_grids[i]) { // Dibuja cada tile de la capa
 						for (sf::RectangleShape w : y) {
 							w.setTexture(&map_textures_grids[i]);
 							window->draw(w);
@@ -306,10 +259,10 @@ void Map::Render(sf::RenderWindow * window)
 			}
 			RenderFase1 = false;
 		}
-		else {
-			for (int i = 0; i < map_tiles_grids.size(); i++) {
-				if (map_layers[i].l_layer == 3) {
-					for (vector<sf::RectangleShape> y : map_tiles_grids[i]) {
+		else { // Si es la segunda fase de renderizado (por arriba del jugador)
+			for (int i = 0; i < map_tiles_grids.size(); i++) { // Por cada capa del mapa
+				if (map_layers[i].l_layer == 3) { // Si la layer no es 3 (por arriba del jugador)
+					for (vector<sf::RectangleShape> y : map_tiles_grids[i]) { // Dibuja cada tile de la capa
 						for (sf::RectangleShape w : y) {
 							w.setTexture(&map_textures_grids[i]);
 							window->draw(w);
@@ -329,18 +282,33 @@ void Map::Render(sf::RenderWindow * window)
 	}
 }
 
-void Map::Destroy()
+void Map::Destroy() // Libera la memoria
 {
 	for (NPC * npc : map_npcs) {
 		npc->Destroy();
+		if (npc != nullptr) {
+			delete npc;
+			npc = nullptr;
+		}
 	}
 	for (Object * obj : map_objs) {
 		obj->Destroy();
+		if (obj != nullptr) {
+			delete obj;
+			obj = nullptr;
+		}
 	}
 	FM->Destroy();
+	if (FM != nullptr) {
+		delete FM;
+		FM = nullptr;
+	}
+	if (game != nullptr) {
+		game = nullptr;
+	}
 }
 
-istream & operator>>(istream & is, Map::ID& id)
+istream & operator>>(istream & is, Map::ID& id) // Sobrecarga del operador para lee un id
 {
 	int i = 0;
 	float u = 0, v = 0;

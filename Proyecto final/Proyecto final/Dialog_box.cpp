@@ -1,6 +1,6 @@
 #include "Dialog_box.h"
 
-
+// CAMBIAR EL BORDE!!!!
 
 Dialog_box::Dialog_box()
 {
@@ -72,7 +72,8 @@ void Dialog_box::Write(const string & text)
 	letter = 0;
 }
 
-void Dialog_box::Init(sf::RenderWindow * window, sf::Color box_color, sf::Color edge_color, sf::Color text_color, const string& text_font_file, int text_size, float text_velocity)
+//void Dialog_box::Init(sf::RenderWindow * window, sf::Color box_color, sf::Color edge_color, sf::Color text_color, const string& text_font_file, int text_size, float text_velocity)
+void Dialog_box::Init(sf::RenderWindow * window, sf::Color box_color, sf::Color edge_color, sf::Color text_color, float text_velocity)
 {
 	db_game_window = window;
 	db_Rectangle.setSize({ db_game_window->getSize().x - 10.f, 75.f});
@@ -86,8 +87,10 @@ void Dialog_box::Init(sf::RenderWindow * window, sf::Color box_color, sf::Color 
 	setBoxColor(box_color);
 	setEdgeColor(edge_color);
 	setTextColor(text_color);
-	setTextFont(text_font_file);
-	setTexSize(text_size);
+	//setTextFont(text_font_file);
+	setTextFont("Fonts/Hijakers.otf");
+	//setTexSize(text_size);
+	setTexSize(20);
 	setActive(false);
 	db_text.setString("Hola que pedo.\nHola que pedo.");
 	db_Normal_Size = { db_game_window->getSize().x - 40.f, db_text.getGlobalBounds().height };
@@ -164,4 +167,11 @@ void Dialog_box::Render(sf::RenderWindow * window)
 
 void Dialog_box::Destroy()
 {
+	if (db_game_window != nullptr) {
+		db_game_window = nullptr;
+	}
+	if (instance != nullptr) {
+		delete instance;
+		instance = nullptr;
+	}
 }

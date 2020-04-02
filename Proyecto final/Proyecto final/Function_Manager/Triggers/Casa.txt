@@ -1,1 +1,4 @@
 on_interact ({5 10}) "Function_Manager/Functions/Casa/Ir a mapa.txt"
+on_map_enter () "Function_Manager/Functions/Casa/Inicial.txt"
+on_interact ({7 1}) "Function_Manager/Functions/Casa/Victoria.txt"
+on_interact ({7 2}) "Function_Manager/Functions/Casa/Victoria.txt"

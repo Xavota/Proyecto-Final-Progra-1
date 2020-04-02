@@ -6,21 +6,22 @@ using namespace std;
 class Dialog_box
 {
 public:
-	static Dialog_box* getInstance();
+	static Dialog_box* getInstance(); // Devuelve la instancia del singleton
 	~Dialog_box();
-	void setBoxColor(sf::Color box_color);
-	void setEdgeColor(sf::Color edge_color);
-	void setTextColor(sf::Color text_color);
-	void setTextFont(const string& text_font_file);
-	void setTexSize(int text_size);
-	void setTextVelocity(float text_velocity);
-	void setActive(bool active);
-	void Write(const string& text);
-	void Init(sf::RenderWindow * window, sf::Color box_color, sf::Color edge_color, sf::Color text_color, const string& text_font_file, int text_size, float text_velocity);
-	void Update(sf::Time deltaTime);
-	string AdjustText(string s);
-	void Render(sf::RenderWindow* window);
-	void Destroy();
+	void setBoxColor(sf::Color box_color); // Le pone color a la caja, por si quieres cambiarlo
+	void setEdgeColor(sf::Color edge_color); // Le pone color al borde, por si quieres cambiarlo
+	void setTextColor(sf::Color text_color); // Le pone color al texto, por si quieres cambiarlo
+	void setTextFont(const string& text_font_file); // Le pone la fuente al texto, por si quieres cambiarlo
+	void setTexSize(int text_size); // Le pone color al borde, por si quieres cambiarlo
+	void setTextVelocity(float text_velocity); // Le pone velocidad al texto, por si quieres cambiarlo
+	void setActive(bool active); // Activa o desactiva la caja
+	void Write(const string& text); // Empieza a escribir el texto indicado
+	//void Init(sf::RenderWindow * window, sf::Color box_color, sf::Color edge_color, sf::Color text_color, const string& text_font_file, int text_size, float text_velocity);
+	void Init(sf::RenderWindow * window, sf::Color box_color, sf::Color edge_color, sf::Color text_color, float text_velocity); // Inicializa las variables
+	void Update(sf::Time deltaTime); // Cada cilco
+	string AdjustText(string s); // Ajusta el texto, para que se mantenga dentro del cuadro
+	void Render(sf::RenderWindow* window); // Renderiza los elementos del cuadro de texto
+	void Destroy(); // Limpia la memoria
 private:
 	static Dialog_box* instance;
 	Dialog_box();

@@ -10,19 +10,19 @@ public:
 	Object(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name);
 	Object();
 	~Object();
-	virtual void Init(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name);
-	virtual void Update(sf::Time deltaTime);
-	virtual void handleInputs(sf::Keyboard::Key key, bool isPressed);
-	void SetState(string anim);
-	void SetState(Animator_Manager::Animation anim);
-	void SetState(Animator_Manager::AnimationTypes anim_type, Animator_Manager::AnimationFace anim_face);
-	void SetState(Animator_Manager::AnimationTypes anim_type);
-	void SetState(Animator_Manager::AnimationFace anim_face);
-	virtual void Render(sf::RenderWindow* game_window);
-	virtual void Destroy();
-	virtual void move(sf::Vector2f p_move);
-	static Object * getObject(string name);
-	Animator_Manager& p_Animation();
+	virtual void Init(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name); // Inicializa las variables
+	virtual void Update(sf::Time deltaTime); // Cada ciclo
+	virtual void handleInputs(sf::Keyboard::Key key, bool isPressed); // Convierte inputs en acciones
+	void SetState(string anim); // Setea el estado del objeto por nombre
+	void SetState(Animator_Manager::Animation anim); // Setea el estado del objeto por animación
+	void SetState(Animator_Manager::AnimationTypes anim_type, Animator_Manager::AnimationFace anim_face); // Setea el estado del objeto por tipo y dirección
+	void SetState(Animator_Manager::AnimationTypes anim_type); // Setea el estado del objeto por tipo
+	void SetState(Animator_Manager::AnimationFace anim_face); // Setea el estado del objeto por dirección
+	virtual void Render(sf::RenderWindow* game_window); // Renderiza el objeto
+	virtual void Destroy(); // Libera la memoria
+	virtual void move(sf::Vector2f p_move); // Mueve al objeto
+	static Object * getObject(string name); // Devuelve el objeto por su nombre de la lista estática de objetos
+	Animator_Manager& p_Animation(); // Devuelve el Animator Manager con la animación actial
 	sf::RectangleShape p_shape;
 protected:
 	friend class Function;

@@ -14,12 +14,11 @@ Object::Object()
 	objs.push_back(this);
 }
 
-
 Object::~Object()
 {
 }
 
-void Object::Init(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name)
+void Object::Init(sf::Vector2f pos, const vector<Animator_Manager::Animation>& anims, string name) // Inicializa las variables necesarias
 {
 	game = Game::getInstance();
 	p_shape.setPosition(pos * game->pixels);
@@ -33,30 +32,19 @@ void Object::Init(sf::Vector2f pos, const vector<Animator_Manager::Animation>& a
 	o_name = name;
 }
 
-void Object::Update(sf::Time deltaTime)
+void Object::Update(sf::Time deltaTime) // Cada ciclo
 {
-	p_shape.move(p_movement);
-	if (p_movement == sf::Vector2f(0.f, 0.f)) {
-		Animator_Manager::Animation a = p_AM.getAnimation(p_AM.getState());
-		p_AM.SetState(a.a_face == Animator_Manager::AnimationFace::up ? p_AM.getAnimation(Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::up) :
-			(a.a_face == Animator_Manager::AnimationFace::down ? p_AM.getAnimation(Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::down) :
-			(a.a_face == Animator_Manager::AnimationFace::left ? p_AM.getAnimation(Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::left) :
-				(a.a_face == Animator_Manager::AnimationFace::right ? p_AM.getAnimation(Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::right) : p_AM.getAnimation()))));
-		
+	p_shape.move(p_movement); // Mueve el objeto
+	if (p_movement == sf::Vector2f(0.f, 0.f)) { // Si la velocidad es 0 pone la animación del tipo idle según su posición
+		p_AM.SetState(Animator_Manager::AnimationTypes::idle);
 	}
 	p_AM.Update(deltaTime);
-	/*for (int i = 0; i < objs.size(); i++) {
-		if (objs[i]->p_shape.getGlobalBounds().intersects(this->p_shape.getGlobalBounds()) && objs[i] != this) {
-			objs[i]->p_shape.setPosition(objs[i]->o_posAnterior);
-			this->p_shape.setPosition(this->o_posAnterior);
-		}
-	}*/
 	vector<Map*> maps = game->mm.maps();
-	for (int i = 0; i < maps.size(); i++) {
-		if (maps[i]->isActive()) {
-			for (int j = 0; j < maps[i]->map_layers.size(); j++) {
-				if (maps[i]->map_layers[j].l_layer == 2) {
-					for (vector<sf::RectangleShape> z : maps[i]->map_tiles_grids[j]) {
+	for (int i = 0; i < maps.size(); i++) { // Por cada mapa
+		if (maps[i]->isActive()) { // Si el mapa está activo
+			for (int j = 0; j < maps[i]->map_layers.size(); j++) { // Por cada layer del mapa
+				if (maps[i]->map_layers[j].l_layer == 2) { // Si la leyer es de nivel 2 (a nivel de jugador)
+					for (vector<sf::RectangleShape> z : maps[i]->map_tiles_grids[j]) { // Detecta las coliciones con los tiles
 						for (sf::RectangleShape y : z) {
 							if (y.getGlobalBounds().intersects(this->p_shape.getGlobalBounds())) {
 								this->p_shape.setPosition(this->o_posAnterior);
@@ -67,15 +55,15 @@ void Object::Update(sf::Time deltaTime)
 			}
 			if (this->p_shape.getPosition().x < 0 || this->p_shape.getPosition().x + this->p_shape.getSize().x > maps[i]->map_size.x * game->pixels
 				|| this->p_shape.getPosition().y < 0 || this->p_shape.getPosition().y + this->p_shape.getSize().y > maps[i]->map_size.y * game->pixels)
-			{
+			{ // Si el jugador se sale de los límites del mapa lo detiene
 				this->p_shape.setPosition(this->o_posAnterior);
 			}
-			for (NPC* npc : maps[i]->map_npcs) {
+			for (NPC* npc : maps[i]->map_npcs) { // Coliciones con npcs
 				if (npc->p_shape.getGlobalBounds().intersects(this->p_shape.getGlobalBounds())) {
 					this->p_shape.setPosition(this->o_posAnterior);
 				}
 			}
-			for (Object* obj : maps[i]->map_objs) {
+			for (Object* obj : maps[i]->map_objs) { // Coliciones con objetos
 				if (obj->p_shape.getGlobalBounds().intersects(this->p_shape.getGlobalBounds())) {
 					this->p_shape.setPosition(this->o_posAnterior);
 				}
@@ -85,49 +73,57 @@ void Object::Update(sf::Time deltaTime)
 	o_posAnterior = p_shape.getPosition();
 }
 
-void Object::handleInputs(sf::Keyboard::Key key, bool isPressed)
+void Object::handleInputs(sf::Keyboard::Key key, bool isPressed) 
 {
 }
 
-void Object::SetState(string anim)
-{
-	p_AM.SetState(anim);
-}
-
-void Object::SetState(Animator_Manager::Animation anim)
+void Object::SetState(string anim) // Setea el estado del jugador con el nombre
 {
 	p_AM.SetState(anim);
 }
 
-void Object::SetState(Animator_Manager::AnimationTypes anim_type, Animator_Manager::AnimationFace anim_face)
+void Object::SetState(Animator_Manager::Animation anim) // Setea el estado del jugador con la animación
+{
+	p_AM.SetState(anim);
+}
+
+void Object::SetState(Animator_Manager::AnimationTypes anim_type, Animator_Manager::AnimationFace anim_face) // Setea el estado del jugador con el tipo y la dirección
 {
 	p_AM.SetState(anim_type, anim_face);
 }
 
-void Object::SetState(Animator_Manager::AnimationTypes anim_type)
+void Object::SetState(Animator_Manager::AnimationTypes anim_type) // Setea el estado del jugador con tipo
 {
 	p_AM.SetState(anim_type);
 }
 
-void Object::SetState(Animator_Manager::AnimationFace anim_face)
+void Object::SetState(Animator_Manager::AnimationFace anim_face) // Setea el estado del jugador con la dirección
 {
 	p_AM.SetState(anim_face);
 }
 
-void Object::Render(sf::RenderWindow * game_window)
+void Object::Render(sf::RenderWindow * game_window) // Renderiza al objeto
 {
 	game_window->draw(p_shape);
 }
 
-void Object::Destroy()
+void Object::Destroy() // Limpia la memoria
+{
+	if (game != nullptr) {
+		game = nullptr;
+	}
+	for (Object* obj : objs) {
+		if (obj != nullptr) {
+			obj = nullptr;
+		}
+	}
+}
+
+void Object::move(sf::Vector2f p_move) // Mueve al objeto
 {
 }
 
-void Object::move(sf::Vector2f p_move)
-{
-}
-
-Object * Object::getObject(string name)
+Object * Object::getObject(string name) // Regresa un objeto de la lista por su nombre
 {
 	for (Object* obj : objs) {
 		if (obj->o_name == name)
@@ -136,7 +132,7 @@ Object * Object::getObject(string name)
 	return nullptr;
 }
 
-Animator_Manager& Object::p_Animation()
+Animator_Manager& Object::p_Animation() // Regresa la animación actual
 {
 	return p_AM;
 }

@@ -1,6 +1,6 @@
 #include "Game.h"
-Game* Game::instance = nullptr;
-Game * Game::getInstance()
+Game* Game::instance = nullptr; // Pone la instancia original en nullptr
+Game * Game::getInstance() // Devuelve la instancia existente del Game
 {
 	if (instance == nullptr)
 		instance = new Game();
@@ -11,11 +11,12 @@ Game::Game()
 {
 }
 
-void Game::Init()
+void Game::Init() // Inicia las variables, crea todo lo necesario para que funcione el juego
 {
-	mWindow.create(sf::VideoMode(512, 512), "SFML Application");
+	mWindow.create(sf::VideoMode(640, 640), "SFML Application");
 	mm.AddMap(Map({ 20.f, 20.f }, { Map::Layer{ "Maps/Layers/Inicio/Layer1.txt", 1 },
-		Map::Layer{ "Maps/Layers/Inicio/Layer2.txt", 2 } }, &mWindow), "Inicio");
+		Map::Layer{ "Maps/Layers/Inicio/Layer2.txt", 2 },
+		Map::Layer{ "Maps/Layers/Inicio/Layer3.txt", 2 } }, &mWindow), "Inicio");
 	mm.AddMap(Map({ 10.f, 10.f }, { Map::Layer{ "Maps/Layers/Casa/Layer1.txt", 1 },
 		Map::Layer{ "Maps/Layers/Casa/Layer2.txt", 2 },
 		Map::Layer{ "Maps/Layers/Casa/Layer3.txt", 3 } }, &mWindow), "Casa");
@@ -35,42 +36,74 @@ void Game::Init()
 		Animator_Manager::Animation{"Animations/Animations/Principal/Idle_left.txt", Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::left} ,
 		Animator_Manager::Animation{"Animations/Animations/Principal/Idle_right.txt", Animator_Manager::AnimationTypes::idle, Animator_Manager::AnimationFace::right} },
 		"Principal");
-	/*mm.getMap("Inicio").FM->CreateFunction(Trigger::onTriggerEnter({ 2, 2 }, { 4, 4 }), Function("Function_Manager/Functions/Inicial/Inicial.txt"));
-	mm.getMap("Inicio").FM->CreateFunction(Trigger::onTriggerExit({ 2, 2 }, { 4, 4 }), Function("Function_Manager/Functions/Inicial/Inicial.txt"));
-	mm.getMap("Inicio").FM->CreateFunction(Trigger::onInteract(&mm.getMap("Inicio").GetNPC("Generico")), Function("Function_Manager/Functions/Inicial/Inicial.txt"));
-	mm.getMap("Inicio").FM->CreateFunction(Trigger::onInteract({ 4, 3 }), Function("Function_Manager/Functions/Inicial/Ir a casa.txt"));
-	mm.getMap("Casa").FM->CreateFunction(Trigger::onMapEnter(&mm.getMap("Casa")), Function("Function_Manager/Functions/Casa/Inicial.txt"));
-	mm.getMap("Casa").FM->CreateFunction(Trigger::onInteract({ 5, 10 }), Function("Function_Manager/Functions/Casa/Ir a mapa.txt"));*/
 	mm.getMap("Inicio").setMapTriggers("Function_Manager/Triggers/Inicial.txt");
 	mm.getMap("Casa").setMapTriggers("Function_Manager/Triggers/Casa.txt");
 	mm.GoToMap("Inicio", { 0, 0 });
+	pm.Init(&mWindow);
 }
 
-void Game::run()
+void Game::run() // Inicia el juego
 {
 	sf::Clock clock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
-	while (mWindow.isOpen())
+	while (mWindow.isOpen()) // El game loop
 	{
-		processEvents();
+		processEvents();                              // Procesa eventos
 		timeSinceLastUpdate += clock.restart();
 		while (timeSinceLastUpdate > TimePerFrame)
 		{
 			timeSinceLastUpdate -= TimePerFrame;
 			processEvents();
-			update(TimePerFrame);
+			update(TimePerFrame);                     // Hace el update
 		}
-		render();
+		render();                                     // Renderiza
 	}
 }
 
-void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
+void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed) // Convierte inputs en acciones, carga el handleInputs de todos sus objetos que lo necesiten
 {
-	g_player->handleInputs(key, isPressed);
-	mm.handleInputs(key, isPressed);
+	if (!pause) {
+		g_player->handleInputs(key, isPressed);
+		mm.handleInputs(key, isPressed);
+	}
+	else {
+		pm.handleInputs(key, isPressed);
+	}
+	if (key == sf::Keyboard::Escape) {
+		if (!keyPressed) {
+			escPressed = isPressed;
+			keyPressed = isPressed;
+		}
+		else if (!isPressed) {
+			keyPressed = isPressed;
+		}
+	}
 }
 
-void Game::processEvents()
+void Game::Save(int file) // Guarda el juego en el archivo del número dado
+{
+	ofstream Save_file;
+	Save_file.open("Saves/" + to_string(file) + ".txt");
+
+	Save_file << mm.getMap().map_name << endl;
+	Save_file << g_player->p_shape.getPosition().x << " " << g_player->p_shape.getPosition().y << endl;
+	Save_file.close();
+}
+
+void Game::Load(int file) // Carga el juego desde el archivo del número dado
+{
+	ifstream Load_file;
+	Load_file.open("Saves/" + to_string(file) + ".txt");
+	string map_name;
+	Load_file >> map_name;
+	float posX, posY;
+	Load_file >> posX >> posY;
+	Load_file.close();
+	mm.GoToMap(map_name, { 0, 0 });
+	g_player->p_shape.setPosition({ posX, posY });
+}
+
+void Game::processEvents() // Procesa los eventos del juego
 {
 	sf::Event event;
 	while (mWindow.pollEvent(event))
@@ -90,23 +123,40 @@ void Game::processEvents()
 	}
 }
 
-void Game::update(sf::Time deltaTime)
+void Game::update(sf::Time deltaTime) // Cada cilco de juego, carga cada update de los objetos que tiene
 {
-	mm.Update(deltaTime);
-	g_player->Update(deltaTime);
+	if (!pause) { // Si no está pausado
+		mm.Update(deltaTime);
+		g_player->Update(deltaTime);
+	}
+	pm.Update(deltaTime);
+	if (escPressed) { // Si presionas el escape, pausa o despausa el juego
+		pause = !pause;
+		escPressed = false;
+	}
 }
 
-void Game::render()
+void Game::render() // Renderiza todo lo que necesita el juego
 {
 	mWindow.clear();
 	mm.Render(&mWindow);
 	g_player->Render(&mWindow);
 	mm.Render(&mWindow);
+	pm.Render(&mWindow);
 	mWindow.display();
 }
 
-void Game::Destroy()
+void Game::Destroy() // Libera la memora
 {
 	mm.Destroy();
 	g_player->Destroy();
+	pm.Destroy();
+	if (g_player != nullptr) {
+		delete g_player;
+		g_player = nullptr;
+	}
+	if (instance != nullptr) {
+		delete instance;
+		instance = nullptr;
+	}
 }

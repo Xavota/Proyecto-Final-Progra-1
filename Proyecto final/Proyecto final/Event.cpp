@@ -1,7 +1,5 @@
 #include "Event.h"
 
-
-
 Event::Event()
 {
 }
@@ -12,12 +10,11 @@ Event::Event(Tag t, Info i)
 	info = i;
 }
 
-
 Event::~Event()
 {
 }
 
-Event Event::DialogBox(string file_name, int pos)
+Event Event::DialogBox(string file_name, int pos) // Toma el texto del archivo indicado y en la posición dada y crea un evento para escribir ese texto en un cuadro de dialogo
 {
 	string *a = new string(), b;
 	ifstream text{ file_name };
@@ -51,12 +48,27 @@ Event Event::DialogBox(string file_name, int pos)
 	return Event{ Tag::dialog_box, Info{{(void*)(a)}} };
 }
 
-Event Event::setSpeed(float* speed, Object* player)
+Event Event::setSpeed(float* speed, Object* player) // Crea el evento para setear la velocidad a un objeto
 {
 	return Event{ Tag::set_speed, Info{{(void*)(speed), (void*)(player)}} };
 }
 
-Event Event::goToMap(string * map_name, sf::Vector2i* pos)
+Event Event::goToMap(string * map_name, sf::Vector2i* pos) // Crea el evento para ir a un mapa
 {
 	return Event(Tag::go_to_map, Info{ {(void*)(map_name), (void*)(pos)} });
+}
+
+Event Event::toWin() // Crea el evento para ganar (provicional)
+{
+	return Event(Tag::to_win, Info{});
+}
+
+void Event::Destroy()
+{
+	/*for (void * z : info.v1) {
+		if (z != nullptr) {
+			delete z;
+			z = nullptr;
+		}
+	}*/
 }

@@ -13,21 +13,21 @@ public:
 	};
 	Trigger();
 	~Trigger();
-	void Init();
-	void Update(sf::Time deltaTime);
-	void Render(sf::RenderWindow* window);
-	void Destory();
-	void handleInputs(sf::Keyboard::Key key, bool isPressed);
-	bool TriggerIsMet();
-	static Trigger onTriggerEnter(sf::Vector2i init, sf::Vector2i fin);
-	static Trigger onTriggerExit(sf::Vector2i init, sf::Vector2i fin);
-	static Trigger onTriggerStay(sf::Vector2i init, sf::Vector2i fin);
-	static Trigger onKeyPressed();
-	static Trigger onKeyReleased();
-	static Trigger onKey();
-	static Trigger onInteract(Object* interactuable);
-	static Trigger onInteract(sf::Vector2i pos);
-	static Trigger onMapEnter(Map* map);
+	void Init(); // Inicializa las variables
+	void Update(sf::Time deltaTime); // Cada ciclo
+	void Render(sf::RenderWindow* window); // Renderiza los objetos
+	void Destory(); // Limpia la memoria
+	void handleInputs(sf::Keyboard::Key key, bool isPressed); // Convierte los inputs en acciones
+	bool TriggerIsMet(); // ¿El input se cumple?
+	static Trigger onTriggerEnter(sf::Vector2i init, sf::Vector2i fin); // Devuelve un trigger con la etiqueta "on triger enter"
+	static Trigger onTriggerExit(sf::Vector2i init, sf::Vector2i fin); // Devuelve un trigger con la etiqueta "on triger exit"
+	static Trigger onTriggerStay(sf::Vector2i init, sf::Vector2i fin); // Devuelve un trigger con la etiqueta "on triger stay"
+	static Trigger onKeyPressed(); // Devuelve un trigger con la etiqueta "on key pressed"
+	static Trigger onKeyReleased(); // Devuelve un trigger con la etiqueta "on key released"
+	static Trigger onKey(); // Devuelve un trigger con la etiqueta "on key"
+	static Trigger onInteract(Object* interactuable); // Devuelve un trigger con la etiqueta "on interact"
+	static Trigger onInteract(sf::Vector2i pos); // Devuelve un trigger con la etiqueta "on pos interact"
+	static Trigger onMapEnter(Map* map); // Devuelve un trigger con la etiqueta "on map enter"
 private:
 	bool inside = false;
 	bool EnterPressed = false, key_pressed = false;

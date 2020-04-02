@@ -4,10 +4,6 @@ Function::Function()
 {
 }
 
-/*Function::Function(sf::RenderWindow * w, vector<Event> e, string n)
-{
-	Init(w, e, n);
-}*/
 Function::Function(string func_file_name) 
 {
 	Init(func_file_name);
@@ -17,12 +13,12 @@ Function::~Function()
 {
 }
 
-void Function::Start()
+void Function::Start() // Activa la función
 {
 	f_Active = true;
 }
 
-void Function::handleInputs(sf::Keyboard::Key key, bool isPressed)
+void Function::handleInputs(sf::Keyboard::Key key, bool isPressed) // Convierte los inputs en acciones
 {
 	if (f_Active) {
 		if (key == sf::Keyboard::Return) {
@@ -37,21 +33,15 @@ void Function::handleInputs(sf::Keyboard::Key key, bool isPressed)
 	}
 }
 
-//void Function::Init(sf::RenderWindow* w, vector<Event> e, string n)
-void Function::Init(string func_file_name)
+void Function::Init(string func_file_name) // Inicializa la función desde un archivo
 {
-	/*f_dialogBox = Dialog_box::getInstance();
-	f_dialogBox->Init(w, sf::Color::Blue, sf::Color::White, sf::Color::White, "Fonts/Hijakers.otf", 20, .1f);
-	events = e;
-	f_name = n;
-	game = Game::getInstance();*/
 	game = Game::getInstance();
 	f_dialogBox = Dialog_box::getInstance();
-	f_dialogBox->Init(&game->mWindow, sf::Color::Blue, sf::Color::White, sf::Color::White, "Fonts/Hijakers.otf", 20, .1f);
+	f_dialogBox->Init(&game->mWindow, sf::Color::Blue, sf::Color::White, sf::Color::White, .1f);
 	vector<Event> e;
 	int newLine = 1; 
 	ifstream func_file;
-	while (newLine != 0)
+	while (newLine != 0) // Mientras la siuiente línea no sea 0, continua
 	{
 		func_file.open( func_file_name );
 		int Line;
@@ -61,90 +51,57 @@ void Function::Init(string func_file_name)
 				string pass;
 				getline(func_file, pass);
 			}
-		} while (Line != newLine && !func_file.eof());
-		if (!func_file.eof()) {
+		} while (Line != newLine && !func_file.eof()); // Lee cada función, desde su nombre, que esté entre paréntesis, los parámeros y la línea siguiente
+		if (!func_file.eof()) { 
 			string event_name;
 			char c = 0;
+			Event ev;
 			func_file >> event_name;
+			func_file >> noskipws;
+			while (c != '(')
+			{
+				func_file >> c;
+			}
+			func_file >> skipws;
 			if (event_name == "set_speed") {
-				func_file >> noskipws;
-				while (c != '(')
-				{
-					func_file >> c;
-				}
-				func_file >> skipws;
 				float * speed = new float();
 				func_file >> *speed;
-				func_file >> noskipws;
-				while (c != '"')
-				{
-					func_file >> c;
-				}
-				string obj_name = "";
-				func_file >> c;
-				while (c != '"')
-				{
-					obj_name += c;
-					func_file >> c;
-				}
-				func_file >> c;
-				func_file >> skipws;
-				if (c == ')')
-					e.push_back(Event::setSpeed(speed, Object::getObject(obj_name)));
-				func_file >> newLine;
+				s_string obj_name;
+				func_file >> obj_name >> noskipws;
+				ev = Event::setSpeed(speed, Object::getObject(obj_name.str));
 			}
 			else if (event_name == "dialog_box") {
-				func_file >> noskipws;
-				while (c != '(')
-				{
-					func_file >> c;
-				}
-				while (c != '"')
-				{
-					func_file >> c;
-				}
-				string dialog_file_name = "";
-				func_file >> c;
-				while (c != '"')
-				{
-					dialog_file_name += c;
-					func_file >> c;
-				}
-				func_file >> c;
-				func_file >> skipws;
+				s_string dialog_file_name;
+				func_file >> dialog_file_name;
 				int dialog_line;
-				func_file >> dialog_line;
-				func_file >> noskipws >> c >> skipws;
-				if (c == ')')
-					e.push_back(Event::DialogBox(dialog_file_name, dialog_line));
-				func_file >> newLine;
+				func_file >> dialog_line >> noskipws;
+				ev = Event::DialogBox(dialog_file_name.str, dialog_line);
 			}
 			else if (event_name == "go_to_map") {
-				func_file >> noskipws;
-				while (c != '(')
-				{
-					func_file >> c;
-				}
-				while (c != '"')
-				{
-					func_file >> c;
-				}
-				string* map_name = new string("");
-				func_file >> c;
-				while (c != '"')
-				{
-					*map_name += c;
-					func_file >> c;
-				}
-				func_file >> c;
-				func_file >> skipws;
+				s_string s_map_name;
+				func_file >> s_map_name;
+				string* map_name = new string(s_map_name.str);
 				sf::Vector2i* pos = new sf::Vector2i();
-				func_file >> *pos;
-				func_file >> noskipws >> c;
-				if (c == ')')
-					e.push_back(Event::goToMap(map_name, pos));
-				func_file >> newLine;
+				func_file >> *pos >> noskipws;
+				ev = Event::goToMap(map_name, pos);
 			}
+			else if (event_name == "win") {
+				ev = Event::toWin();
+			}
+			do
+			{
+				func_file >> c;
+				if (c != ')' && c != ' ' || func_file.fail()) {
+					func_file.clear();
+					cout << "set_speed: argumentos no validos" << endl;
+					break;
+				}
+				else if (c == ')') {
+					e.push_back(ev);
+				}
+			} while (c != ')');
+			func_file >> skipws;
+			func_file >> newLine;
 			func_file.close();
 		}
 		else{
@@ -156,9 +113,9 @@ void Function::Init(string func_file_name)
 	events = e;
 }
 
-void Function::Update(sf::Time deltaTime)
+void Function::Update(sf::Time deltaTime) // Cada ciclo
 {
-	if (f_Active) {
+	if (f_Active) { // Si la función está activa, va evento por evento ejecutandolos
 		switch (events[f_nEvent].tag)
 		{
 		case Event::Tag::dialog_box:
@@ -169,6 +126,10 @@ void Function::Update(sf::Time deltaTime)
 			break;
 		case Event::Tag::go_to_map:
 			GoToMap(*((string*)(events[f_nEvent].info.v1[0])), *((sf::Vector2i*)(events[f_nEvent].info.v1[1])));
+			break;
+		case Event::Tag::to_win:
+			Win();
+			break;
 		default:
 			break;
 		}
@@ -177,19 +138,29 @@ void Function::Update(sf::Time deltaTime)
 			f_nEvent = 0;
 		}
 	}
-	f_dialogBox->Update(deltaTime);
+	f_dialogBox->Update(deltaTime); // Hace el update del cuadro de texto
 }
 
-void Function::Render(sf::RenderWindow* w)
+void Function::Render(sf::RenderWindow* w) // Renderiza los objetos necesarios para las funciones
 {
 	f_dialogBox->Render(w);
 }
 
-void Function::Destroy()
+void Function::Destroy() // Limpia la memoria
 {
+	f_dialogBox->Destroy();
+	if (game != nullptr) {
+		game = nullptr;
+	}
+	if (f_dialogBox != nullptr) {
+		f_dialogBox = nullptr;
+	}
+	for (Event& ev : events) {
+		ev.Destroy();
+	}
 }
 
-void Function::TextBox(string text)
+void Function::TextBox(string text) // Función de escribit en el cuadro de diálogo
 {
 	if (!f_working) {
 		f_dialogBox->setActive(true);
@@ -207,13 +178,13 @@ void Function::TextBox(string text)
 	}
 }
 
-void Function::setSpeed(float speed, Object * player)
+void Function::setSpeed(float speed, Object * player) // Función de setear la velocidad de un objeto
 {
 	player->Speed = speed;
 	f_nEvent++;
 }
 
-void Function::GoToMap(const string& map_name, sf::Vector2i pos)
+void Function::GoToMap(const string& map_name, sf::Vector2i pos) // Función para ir a un mapa
 {
 	try
 	{
@@ -226,7 +197,35 @@ void Function::GoToMap(const string& map_name, sf::Vector2i pos)
 	f_nEvent++;
 }
 
-istream & operator>>(istream & is, sf::Vector2i& v)
+void Function::Win() // Función para ganar (provicional)
+{
+	game->mWindow.close();
+	sf::RenderWindow Win_cam{ sf::VideoMode{100, 100}, "You win" };
+	sf::Text Win_text;
+	sf::Font Win_text_font;
+	Win_text.setString("You Win");
+	Win_text_font.loadFromFile("Fonts/Hijakers.otf");
+	Win_text.setFont(Win_text_font);
+	Win_text.setCharacterSize(30);
+	Win_text.setPosition({ Win_cam.getSize().x / 2 - Win_text.getGlobalBounds().width / 2, Win_cam.getSize().y / 2 - Win_text.getGlobalBounds().height / 2 });
+	while (Win_cam.isOpen()) {
+		sf::Event event;
+		while (Win_cam.pollEvent(event))
+		{
+			switch (event.type)
+			{
+			case sf::Event::Closed:
+				Win_cam.close();
+				break;
+			}
+		}
+		Win_cam.clear();
+		Win_cam.draw(Win_text);
+		Win_cam.display();
+	}
+}
+
+istream & operator>>(istream & is, sf::Vector2i& v) // La sobrecarga del operador para leer vector2i
 {
 	char c = 0;
 	is >> noskipws;
